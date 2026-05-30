@@ -2,6 +2,10 @@
 
 A cross-platform 3D printer control app built with Flutter. Connects to printers via serial (USB) with a real-time terminal, temperature monitoring, movement controls, and macro system.
 
+## Install
+At this moment only build for macos in [releases](https://github.com/peekpt/control_3d/releases/tag/1.0.0)
+but if you have flutter installed you can compile your platform version.
+
 ## Features
 
 - **Serial connection** — connect to printers over USB with configurable baud rates and auto-reconnect
@@ -24,6 +28,14 @@ A cross-platform 3D printer control app built with Flutter. Connects to printers
 | **Terminal** | G-code input/output, silent mode toggle, macros |
 | **Settings** | Theme picker, printer management, clear command history |
 
+
+<p float="center">
+  <img src="https://github.com/peekpt/control_3d/blob/main/screenshots/control.png" width="auto" height="600"/>
+  <img src="https://github.com/peekpt/control_3d/blob/main/screenshots/temperature.png" width="auto" height="600"/>
+  <img src="https://github.com/peekpt/control_3d/blob/main/screenshots/terminal.png" width="auto" height="600"/>
+  <img src="https://github.com/peekpt/control_3d/blob/main/screenshots/settings.png" width="auto" height="600"/>
+  
+</p>
 ## Requirements
 
 - Flutter SDK `^3.11.5`
