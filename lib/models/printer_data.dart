@@ -18,6 +18,7 @@ class PrinterData {
   final int speed;
   final int flow;
   final List<String> terminalLog;
+  final String? autoDisconnectReason;
 
   const PrinterData({
     this.connectionState = PrinterConnectionState.disconnected,
@@ -33,6 +34,7 @@ class PrinterData {
     this.speed = 100,
     this.flow = 100,
     this.terminalLog = const [],
+    this.autoDisconnectReason,
   });
 
   PrinterData copyWith({
@@ -49,6 +51,7 @@ class PrinterData {
     int? speed,
     int? flow,
     List<String>? terminalLog,
+    String? autoDisconnectReason,
   }) =>
       PrinterData(
         connectionState: connectionState ?? this.connectionState,
@@ -64,5 +67,6 @@ class PrinterData {
         speed: speed ?? this.speed,
         flow: flow ?? this.flow,
         terminalLog: terminalLog ?? this.terminalLog,
+        autoDisconnectReason: autoDisconnectReason,
       );
 }

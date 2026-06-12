@@ -204,14 +204,22 @@ class _SparklinePainter extends CustomPainter {
     final drawH = size.height - margin * 2;
     final stepX = size.width / (data.length - 1);
 
-    final path = Path();
+    final points = <Offset>[];
     for (int i = 0; i < data.length; i++) {
       final x = i * stepX;
       final y = margin + drawH - ((data[i] - min) / actualRange) * drawH;
-      if (i == 0) {
-        path.moveTo(x, y);
+      points.add(Offset(x, y));
+    }
+
+    final path = Path();
+    path.moveTo(points[0].dx, points[0].dy);
+    for (int i = 1; i < points.length; i++) {
+      if (i < points.length - 1) {
+        final midX = (points[i].dx + points[i + 1].dx) / 2;
+        final midY = (points[i].dy + points[i + 1].dy) / 2;
+        path.quadraticBezierTo(points[i].dx, points[i].dy, midX, midY);
       } else {
-        path.lineTo(x, y);
+        path.lineTo(points[i].dx, points[i].dy);
       }
     }
 

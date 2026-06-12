@@ -76,7 +76,7 @@ class _ExtrudeSectionState extends ConsumerState<ExtrudeSection> {
                     _ExtrudeBtn(
                       icon: FontAwesomeIcons.chevronUp,
                       label: 'E\u2011',
-                      color: Colors.grey,
+                      color: const Color(0xFF444444),
                       enabled: canExtrude,
                       onPressed: canExtrude ? () => notifier.extrude(-_amount) : null,
                     ),
@@ -84,7 +84,7 @@ class _ExtrudeSectionState extends ConsumerState<ExtrudeSection> {
                     _ExtrudeBtn(
                       icon: FontAwesomeIcons.chevronDown,
                       label: 'E+',
-                      color: Colors.grey,
+                      color: const Color(0xFF444444),
                       enabled: canExtrude,
                       onPressed: canExtrude ? () => notifier.extrude(_amount) : null,
                     ),
@@ -165,8 +165,8 @@ class _ExtrudeBtnState extends State<_ExtrudeBtn> {
         ? (_pressed ? widget.color.withAlpha(180) : widget.color)
         : widget.color.withAlpha(80);
     final fgColor = enabled
-        ? (_pressed ? Colors.black54 : Colors.black87)
-        : Colors.black38;
+        ? (_pressed ? Colors.white70 : Colors.white)
+        : Colors.white38;
 
     return GestureDetector(
       onTap: widget.onPressed,

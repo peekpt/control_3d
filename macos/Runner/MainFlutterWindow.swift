@@ -10,6 +10,9 @@ class MainFlutterWindow: NSWindow {
 
     RegisterGeneratedPlugins(registry: flutterViewController)
 
+    self.setFrame(NSRect(x: 0, y: 0, width: 1020, height: 710), display: true)
+    self.center()
+
     super.awakeFromNib()
   }
 }

@@ -28,7 +28,9 @@ class SerialConnectionNotifier extends StateNotifier<PrinterData> {
   StreamSubscription? _messageSub;
   Timer? _tempPollTimer;
   Timer? _coordPollTimer;
+  Timer? _aliveCheckTimer;
   bool _hideSystemCommands = false;
+  int _noResponseCount = 0;
 
   SerialConnectionNotifier(this._ref) : super(const PrinterData());
 
@@ -47,6 +49,7 @@ class SerialConnectionNotifier extends StateNotifier<PrinterData> {
       _startListening();
       _startTempPolling();
       _startCoordPolling();
+      _startAliveCheck();
     } else {
       state = state.copyWith(connectionState: PrinterConnectionState.disconnected);
     }
@@ -54,7 +57,9 @@ class SerialConnectionNotifier extends StateNotifier<PrinterData> {
     return success;
   }
 
-  void disconnect() {
+  void disconnect({String? reason}) {
+    _aliveCheckTimer?.cancel();
+    _aliveCheckTimer = null;
     _tempPollTimer?.cancel();
     _tempPollTimer = null;
     _coordPollTimer?.cancel();
@@ -62,11 +67,22 @@ class SerialConnectionNotifier extends StateNotifier<PrinterData> {
     _dataSub?.cancel();
     _messageSub?.cancel();
     _ref.read(serialServiceProvider).disconnect();
-    state = const PrinterData();
+    state = PrinterData(autoDisconnectReason: reason);
+    _noResponseCount = 0;
   }
 
   void setHideSystemCommands(bool v) {
     _hideSystemCommands = v;
+  }
+
+  void clearTerminalLog() {
+    state = state.copyWith(terminalLog: []);
+  }
+
+  void clearAutoDisconnectReason() {
+    if (state.autoDisconnectReason != null) {
+      state = state.copyWith(autoDisconnectReason: null);
+    }
   }
 
   void _startTempPolling() {
@@ -83,6 +99,18 @@ class SerialConnectionNotifier extends StateNotifier<PrinterData> {
     });
   }
 
+  void _startAliveCheck() {
+    _aliveCheckTimer?.cancel();
+    _noResponseCount = 0;
+    _aliveCheckTimer = Timer.periodic(const Duration(seconds: 10), (_) {
+      if (_noResponseCount >= 5) {
+        disconnect(reason: 'Printer not responding');
+        return;
+      }
+      _noResponseCount++;
+    });
+  }
+
   void _startListening() {
     final service = _ref.read(serialServiceProvider);
 
@@ -91,6 +119,8 @@ class SerialConnectionNotifier extends StateNotifier<PrinterData> {
         disconnect();
         return;
       }
+
+      _noResponseCount = 0;
 
       final updates = <String, dynamic>{};
 
@@ -205,6 +235,7 @@ class SerialConnectionNotifier extends StateNotifier<PrinterData> {
 
   @override
   void dispose() {
+    _aliveCheckTimer?.cancel();
     _tempPollTimer?.cancel();
     _coordPollTimer?.cancel();
     _dataSub?.cancel();

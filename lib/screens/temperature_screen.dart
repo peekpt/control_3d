@@ -70,6 +70,7 @@ class _TemperatureScreenState extends ConsumerState<TemperatureScreen> {
                     spotGetter: (r) => r.nozzleTemp,
                     targetGetter: (r) => r.nozzleTarget,
                     color: Colors.orange,
+                    maxY: 300,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -80,6 +81,7 @@ class _TemperatureScreenState extends ConsumerState<TemperatureScreen> {
                     spotGetter: (r) => r.bedTemp,
                     targetGetter: (r) => r.bedTarget,
                     color: Colors.blue,
+                    maxY: 120,
                   ),
                 ),
                 const SizedBox(height: 12),
@@ -130,6 +132,7 @@ class _TemperatureScreenState extends ConsumerState<TemperatureScreen> {
     required double Function(TemperatureRecord) spotGetter,
     required double Function(TemperatureRecord) targetGetter,
     required Color color,
+    required double maxY,
   }) {
     if (records.isEmpty) {
       return Center(
@@ -154,15 +157,29 @@ class _TemperatureScreenState extends ConsumerState<TemperatureScreen> {
       maxTemp = max(maxTemp, spotGetter(r));
       maxTemp = max(maxTemp, targetGetter(r));
     }
-    maxTemp = max(maxTemp + 20, 300);
+    maxTemp = max(maxTemp + 20, maxY);
 
     final spots = filtered.map((r) {
       final x = (r.timestamp.millisecondsSinceEpoch.toDouble() - minTime) / timeRange;
       return FlSpot(x, spotGetter(r));
     }).toList();
 
+    final currentTarget = targetGetter(filtered.last);
+
     return LineChart(
       LineChartData(
+        extraLinesData: ExtraLinesData(
+          horizontalLines: currentTarget > 0
+              ? [
+                  HorizontalLine(
+                    y: currentTarget,
+                    color: Colors.lightBlue.shade100.withAlpha(120),
+                    strokeWidth: 1,
+                    dashArray: [6, 4],
+                  ),
+                ]
+              : [],
+        ),
         gridData: FlGridData(
           show: true,
           horizontalInterval: 50,
@@ -208,6 +225,7 @@ class _TemperatureScreenState extends ConsumerState<TemperatureScreen> {
           LineChartBarData(
             spots: spots,
             isCurved: true,
+            curveSmoothness: 0.6,
             color: color,
             barWidth: 2,
             isStrokeCapRound: true,

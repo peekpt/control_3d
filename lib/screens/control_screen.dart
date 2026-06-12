@@ -74,6 +74,7 @@ class ControlScreen extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Expanded(
+            flex: 3,
             child: Column(
               children: [
                 const Center(child: DirectionalPad()),
@@ -86,6 +87,7 @@ class ControlScreen extends ConsumerWidget {
           ),
           const SizedBox(width: gap),
           Expanded(
+            flex: 2,
             child: Column(
               children: [
                 const ExtrudeSection(),

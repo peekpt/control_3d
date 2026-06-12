@@ -112,5 +112,17 @@ class StorageService {
           gcodeCommand: 'M302 P1\\nG1 E100 F100',
           sortOrder: 4,
         ),
+        const Macro(
+          id: 'default_6',
+          name: 'Read Memory',
+          gcodeCommand: 'M503',
+          sortOrder: 5,
+        ),
+        const Macro(
+          id: 'default_7',
+          name: 'Save',
+          gcodeCommand: 'M500',
+          sortOrder: 6,
+        ),
       ];
 }

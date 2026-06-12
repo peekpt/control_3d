@@ -19,6 +19,7 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   int _currentIndex = 0;
+  bool _showedDisconnectDialog = false;
 
   final _screens = const [
     ControlScreen(),
@@ -34,6 +35,30 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final isConnected = printerData.connectionState == PrinterConnectionState.connected;
     final isConnecting = printerData.connectionState == PrinterConnectionState.connecting;
     final notifier = ref.read(serialConnectionProvider.notifier);
+
+    final reason = printerData.autoDisconnectReason;
+    if (reason != null && !_showedDisconnectDialog) {
+      _showedDisconnectDialog = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        showDialog(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: const Text('Printer Disconnected'),
+            content: Text(reason),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  notifier.clearAutoDisconnectReason();
+                  _showedDisconnectDialog = false;
+                  Navigator.of(ctx).pop();
+                },
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        );
+      });
+    }
 
     final desktop = isDesktop(context);
 

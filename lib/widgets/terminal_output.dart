@@ -10,7 +10,7 @@ class TerminalOutput extends StatelessWidget {
     required this.scrollController,
   });
 
-  static const _bg = Color(0xFF1A1B26);
+  static const _bg = Color(0xFF111218);
   static const _bgLight = Color(0xFFCBCCD1);
 
   @override
@@ -34,6 +34,7 @@ class TerminalOutput extends StatelessWidget {
           final isSent = line.startsWith('>>>');
           final isError = line.startsWith('Error:') || line.contains('error');
           final isOk = line == 'ok';
+          final isResponse = !isSent && !isError && !isOk;
 
           Color textColor;
           if (isError) {
@@ -41,7 +42,9 @@ class TerminalOutput extends StatelessWidget {
           } else if (isOk) {
             textColor = cs.tertiary;
           } else if (isSent) {
-            textColor = cs.primary;
+            textColor = Colors.red.shade300;
+          } else if (isResponse) {
+            textColor = theme.brightness == Brightness.dark ? Colors.white : Colors.black;
           } else {
             textColor = cs.onSurface;
           }
@@ -50,17 +53,45 @@ class TerminalOutput extends StatelessWidget {
           final commandPart = commentIdx >= 0 ? line.substring(0, commentIdx) : line;
           final commentPart = commentIdx >= 0 ? line.substring(commentIdx + 1) : null;
 
+          final displayText = isSent ? commandPart.replaceFirst('>>>', '').trimLeft() : isOk ? '' : commandPart;
+
           return Padding(
             padding: const EdgeInsets.symmetric(vertical: 1),
             child: RichText(
               text: TextSpan(
-                style: const TextStyle(
-                  fontFamily: 'monospace',
-                  fontSize: 11,
+                style: TextStyle(
+                  fontFamily: 'JetBrainsMono',
+                  fontSize: 13,
+                  fontFeatures: const [FontFeature('zero')],
                 ),
+
                 children: [
+                  if (isSent)
+                    WidgetSpan(
+                      alignment: PlaceholderAlignment.middle,
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: 4),
+                        child: Icon(Icons.arrow_forward_rounded, size: 11, color: textColor),
+                      ),
+                    ),
+                  if (isOk)
+                    WidgetSpan(
+                      alignment: PlaceholderAlignment.middle,
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: 4),
+                        child: Icon(Icons.check, size: 12, color: textColor),
+                      ),
+                    ),
+                  if (isResponse)
+                    WidgetSpan(
+                      alignment: PlaceholderAlignment.middle,
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: 4),
+                        child: Icon(Icons.arrow_back_rounded, size: 11, color: textColor),
+                      ),
+                    ),
                   TextSpan(
-                    text: commandPart,
+                    text: displayText,
                     style: TextStyle(
                       color: textColor,
                       fontWeight: isSent ? FontWeight.bold : FontWeight.normal,

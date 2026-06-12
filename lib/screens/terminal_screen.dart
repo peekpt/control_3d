@@ -26,6 +26,7 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
   List<String> _commandHistory = [];
   int _historyIndex = -1;
   bool _hideSystem = false;
+  bool _clearBufferFlash = false;
 
   @override
   void initState() {
@@ -167,29 +168,60 @@ class _TerminalScreenState extends ConsumerState<TerminalScreen> {
                 Positioned(
                   top: 4,
                   right: 4,
-                  child: GestureDetector(
-                    onTap: () {
-                      setState(() => _hideSystem = !_hideSystem);
-                      ref.read(serialConnectionProvider.notifier).setHideSystemCommands(_hideSystem);
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.85),
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Text(
-                        _hideSystem ? 'silent mode is ON' : 'silent mode is OFF',
-                        style: TextStyle(
-                          fontSize: 10,
-                          color: _hideSystem
-                              ? theme.colorScheme.tertiary
-                              : theme.colorScheme.onSurfaceVariant,
-                          fontWeight:
-                              _hideSystem ? FontWeight.w600 : FontWeight.normal,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          setState(() => _hideSystem = !_hideSystem);
+                          ref.read(serialConnectionProvider.notifier).setHideSystemCommands(_hideSystem);
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.85),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            _hideSystem ? 'silent mode is ON' : 'silent mode is OFF',
+                            style: TextStyle(
+                              fontSize: 10,
+                              color: _hideSystem
+                                  ? theme.colorScheme.tertiary
+                                  : theme.colorScheme.onSurfaceVariant,
+                              fontWeight:
+                                  _hideSystem ? FontWeight.w600 : FontWeight.normal,
+                            ),
+                          ),
                         ),
                       ),
-                    ),
+                      const SizedBox(width: 4),
+                      GestureDetector(
+                        onTap: () {
+                          ref.read(serialConnectionProvider.notifier).clearTerminalLog();
+                          setState(() => _clearBufferFlash = true);
+                          Future.delayed(const Duration(milliseconds: 400), () {
+                            if (mounted) setState(() => _clearBufferFlash = false);
+                          });
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.85),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(
+                            'clear buffer',
+                            style: TextStyle(
+                              fontSize: 10,
+                              color: _clearBufferFlash
+                                  ? Colors.green
+                                  : theme.colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
